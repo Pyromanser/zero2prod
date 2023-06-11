@@ -115,4 +115,10 @@ async fn subscribe_returns_a_400_when_data_is_missing(invalid_body: &str, error_
         "The API did not fail with 400 Bad Request when the payload was {}.",
         error_message
     );
+
+    let agg = sqlx::query!("SELECT COUNT(*) FROM subscriptions",)
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved subscription.");
+    assert_eq!(agg.count, Some(0));
 }
