@@ -38,5 +38,6 @@ features = [
     "macros",
     "postgres",
     "uuid",
-    "chrono"
+    "chrono",
+    "offline"
 ]
