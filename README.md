@@ -5,7 +5,7 @@
 - cargo check
 - cargo clippy  -- -W clippy::all -W clippy::pedantic
 - cargo audit
-- TEST_LOG=true cargo test health_check_works | bunyan
+- TEST_LOG=true cargo test | bunyan
 - cargo +nightly tarpaulin --verbose --all-features --workspace
 
 
