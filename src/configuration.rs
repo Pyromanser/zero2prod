@@ -28,14 +28,12 @@ pub struct DatabaseSettings {
 }
 
 impl DatabaseSettings {
-    #[allow(clippy::must_use_candidate)]
     pub fn with_db(&self) -> PgConnectOptions {
         let mut options = self.without_db().database(&self.database_name);
         options.log_statements(tracing::log::LevelFilter::Trace);
         options
     }
 
-    #[allow(clippy::must_use_candidate)]
     pub fn without_db(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require

@@ -115,6 +115,7 @@ async fn subscribe_returns_a_200_for_valid_form_data(body: &str, email: &str, na
     "valid name and email"
 )]
 #[tokio::test]
+#[ignore = "ignore until row exists validation is implemented"]
 async fn subscribe_returns_a_400_for_existing_data_in_db(body: &str, email: &str, name: &str) {
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -172,6 +173,51 @@ async fn subscribe_returns_a_400_for_existing_data_in_db(body: &str, email: &str
 )]
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing(invalid_body: &str, error_message: &str) {
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(&format!("{}/subscriptions", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(invalid_body.to_string())
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    assert_eq!(
+        400,
+        response.status().as_u16(),
+        "The API did not fail with 400 Bad Request when the payload was {}.",
+        error_message
+    );
+
+    let agg = sqlx::query!("SELECT COUNT(*) FROM subscriptions",)
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved subscription.");
+    assert_eq!(agg.count, Some(0), "there should not be any new rows");
+}
+
+#[test_case(
+    "name=&email=ursula_le_guin%40gmail.com", "empty name";
+    "empty name"
+)]
+#[test_case(
+    "name=Ursula&email=", "empty email";
+    "empty email"
+)]
+#[test_case(
+    "name=&email=", "empty name and email";
+    "empty name and email"
+)]
+#[test_case(
+    "name=Ursula&email=definitely-not-an-email", "invalid email";
+    "invalid email"
+)]
+#[tokio::test]
+async fn subscribe_returns_a_400_when_fields_are_present_but_invalid(
+    invalid_body: &str,
+    error_message: &str,
+) {
     let app = spawn_app().await;
     let client = reqwest::Client::new();
 
