@@ -83,7 +83,7 @@ pub async fn insert_subscriber(
         new_subscriber.name.as_ref(),
         Utc::now()
     )
-    .execute(transaction)
+    .execute(&mut **transaction)
     .await
     .map_err(|e| {
         tracing::error!("Failed to execute query: {:?}", e);
@@ -138,7 +138,7 @@ pub async fn store_token(
         subscription_token,
         subscriber_id
     )
-    .execute(transaction)
+    .execute(&mut **transaction)
     .await
     .map_err(|e| {
         tracing::error!("Failed to execute query: {:?}", e);
