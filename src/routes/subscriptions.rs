@@ -26,7 +26,11 @@ impl TryFrom<FormData> for NewSubscriber {
     }
 }
 
-fn error_chain_fmt(
+/// # Errors
+/// This function will return the error produced by the `writeln!` macro, if it encounters any error.
+/// This error is usually of type `std::fmt::Error`. It is produced in situations where the `std::fmt::Formatter` cannot write
+/// the formatted string into a destination, most commonly when the destination is full or does not exist.
+pub fn error_chain_fmt(
     e: &impl std::error::Error,
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
@@ -170,7 +174,7 @@ pub async fn send_confirmation_email(
         Click <a href=\"{confirmation_link}\">here</a> to confirm your subscription."
     );
     email_client
-        .send_email(new_subscriber.email, "Welcome!", &html_body, &plain_body)
+        .send_email(&new_subscriber.email, "Welcome!", &html_body, &plain_body)
         .await
 }
 
